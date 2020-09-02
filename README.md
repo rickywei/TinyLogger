@@ -1,2 +1,2 @@
-# WebServer
-A C++ web server
+# TingLogger
+A C++ Asynchronous Logging library

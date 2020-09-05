@@ -1,3 +1,5 @@
+#include <unistd.h>
+
 #include <iostream>
 #include <thread>
 
@@ -6,9 +8,19 @@ using namespace std;
 using namespace log;
 
 int main() {
-    Logger::Init(true, false);
+    Logger::Init(true, true);
 
-    Logger() << "123";
+    LOG() << "LOG";
+    LOGL(LogLevel::INFO) << "LOGL";
+    FATAL() << "FATAL";
+    ERROR() << "ERROR";
+    WARN() << "WARN";
+    INFO() << "INFO";
+    DEBUG() << "DEBUG";
+
+    sleep(1);
+
+    Logger::Stop();
 
     return 0;
 }

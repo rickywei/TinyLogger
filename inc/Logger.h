@@ -14,11 +14,6 @@ namespace log {
 
 enum class LogLevel { FATAL = 0, ERROR, WARN, INFO, DEBUG };
 
-map<LogLevel, string> loglevel_str = {
-    {FATAL, "FATAL"}, {ERROR, "ERROR"}, {WARN, "WARN"},
-    {INFO, "INFO"},   {DEBUG, "DEBUG"},
-};
-
 class nocopyable {
    protected:
     nocopyable() = default;
@@ -31,21 +26,26 @@ class nocopyable {
 
 class Logger : nocopyable {
    public:
-    Logger();
-    Logger(LogLevel loglevel);
+    Logger(string FILE, string FUNCTION, int LINE);
+    Logger(string FILE, string FUNCTION, int LINE, LogLevel loglevel);
     ~Logger();
 
     Logger& operator<<(string s);
 
-    static void Init(bool t = false, bool f = true);
+    static void Init();
+    static void Init(bool t, bool f);
     static void Stop();
     static bool HasLog();
-    static void SetWriteChannel(bool t = false, bool f = true);
+    static void SetWriteChannel(bool t, bool f);
 
    private:
     LogLevel loglevel_;
 
     string log_line_;
+
+    string FILE_;
+    string FUNCTION_;
+    int LINE_;
 
     static bool write_terminal_;
     static bool write_file_;
@@ -64,10 +64,19 @@ class Logger : nocopyable {
 
     static void ThreadFunc();
 
-    static void SetFileName(const string file_name = "log.log");
+    static void SetFileName();
+    static void SetFileName(const string file_name);
 
     void Format(const string& s);
 };
+
+#define LOG() Logger(__FILE__, __FUNCTION__, __LINE__)
+#define LOGL(log_level) Logger(__FILE__, __FUNCTION__, __LINE__, log_level)
+#define FATAL() Logger(__FILE__, __FUNCTION__, __LINE__, LogLevel::FATAL)
+#define ERROR() Logger(__FILE__, __FUNCTION__, __LINE__, LogLevel::ERROR)
+#define WARN() Logger(__FILE__, __FUNCTION__, __LINE__, LogLevel::WARN)
+#define INFO() Logger(__FILE__, __FUNCTION__, __LINE__, LogLevel::INFO)
+#define DEBUG() Logger(__FILE__, __FUNCTION__, __LINE__, LogLevel::DEBUG)
 
 }  // namespace log
 

@@ -5,6 +5,9 @@ A C++ Asynchronous Logging library
 ![GitHub last commit](https://img.shields.io/github/last-commit/RickyWei/TinyLogger)
 ![Travis (.com)](https://img.shields.io/travis/com/RickyWei/TinyLogger)
 
+## Design
+
+[https://rickywei.github.io/blog/design/logger.html](https://rickywei.github.io/blog/design/logger.html)
 
 ## How to use
 

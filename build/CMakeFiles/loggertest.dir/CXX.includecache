@@ -24,3 +24,15 @@ string
 Logger.h
 /home/ricky/TinyLogger/Logger.h
 
+/home/ricky/TinyLogger/src/Logger.cc
+Logger.h
+/home/ricky/TinyLogger/src/Logger.h
+chrono
+-
+ctime
+-
+iostream
+-
+thread
+-
+

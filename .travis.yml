@@ -1,17 +1,17 @@
 language: cpp
 branches: master
 
-before_script:
-  - mkdir -p build
-  - cd build
-  - rm -rf *
-  - cmake ..
+# before_script:
+#   - mkdir -p build
+#   - cd build
+#   - rm -rf *
+#   - cmake ..
 
 script:
-  - make
+  - ./build.sh
 
-after_script:
-  - cd ..
-  - git add .
-  - git commit -m "travis auto build"
-  - git push
+# after_script:
+#   - cd ..
+#   - git add .
+#   - git commit -m "travis auto build"
+#   - git push

@@ -37,6 +37,7 @@ class Logger : nocopyable {
     static void Stop();
     static bool HasLog();
     static void SetWriteChannel(bool t, bool f);
+    static void SetColor(bool color);
 
    private:
     LogLevel loglevel_;
@@ -61,6 +62,8 @@ class Logger : nocopyable {
     static mutex mtx_f_;
     static bool looping_;
     static int interval_;
+
+    static bool color_;
 
     static void ThreadFunc();
 

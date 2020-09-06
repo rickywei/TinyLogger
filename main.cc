@@ -1,14 +1,10 @@
-#include <unistd.h>
-
-#include <iostream>
-#include <thread>
-
 #include "Logger.h"
 using namespace std;
 using namespace log;
 
 int main() {
-    Logger::Init(true, true);
+    Logger::Init(true, false);
+    Logger::SetColor(true);
 
     LOG() << "LOG";
     LOGL(LogLevel::INFO) << "LOGL";
@@ -17,8 +13,6 @@ int main() {
     WARN() << "WARN";
     INFO() << "INFO";
     DEBUG() << "DEBUG";
-
-    sleep(1);
 
     Logger::Stop();
 

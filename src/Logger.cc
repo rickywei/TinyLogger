@@ -8,7 +8,7 @@
 using namespace log;
 
 #define MAX_LOG_LINE_LEN 512
-#define MAX_LOG_BUF_SIZE 1024000
+#define MAX_LOG_BUF_SIZE 102400
 #define WAIT_INTERVAL 2
 
 map<LogLevel, string> loglevel_str = {
@@ -36,7 +36,7 @@ Logger::Logger(string FILE, string FUNCTION, int LINE, LogLevel loglevel)
 }
 
 Logger::~Logger() {
-    lock_guard<mutex> lk(mtx_);
+    // lock_guard<mutex> lk(mtx_);
     if (Logger::write_terminal_) {
         cerr << log_line_ << flush;
     }
@@ -91,6 +91,8 @@ void Logger::SetWriteChannel(bool t, bool f) {
     Logger::write_file_ = f;
 }
 
+void Logger::SetColor(bool color) { Logger::color_ = color; }
+
 bool Logger::write_terminal_ = false;
 bool Logger::write_file_ = true;
 
@@ -105,6 +107,8 @@ mutex Logger::mtx_;
 mutex Logger::mtx_f_;
 bool Logger::looping_ = false;
 int Logger::interval_ = WAIT_INTERVAL;
+
+bool Logger::color_ = false;
 
 void Logger::ThreadFunc() {
     while (looping_) {
@@ -149,12 +153,37 @@ void Logger::SetFileName(const string file_name) {
 }
 
 void Logger::Format(const string& s) {
+    if (Logger::color_) {
+        switch (Logger::loglevel_) {
+            case LogLevel::FATAL:
+                log_line_ = "\033[31m";
+                break;
+            case LogLevel::ERROR:
+                log_line_ = "\033[31m";
+                break;
+            case LogLevel::WARN:
+                log_line_ = "\033[33m";
+                break;
+            case LogLevel::INFO:
+                break;
+            case LogLevel::DEBUG:
+                log_line_ = "\033[32m";
+                break;
+            default:
+                break;
+        }
+    }
+
     time_t rawtime;
     time(&rawtime);
     tm timeinfo;
     localtime_r(&rawtime, &timeinfo);
     char cs[64] = {'\0'};
     strftime(cs, 64, "%Y%m%d %X ", &timeinfo);
-    log_line_ = string(cs) + loglevel_str[loglevel_] + " " + FILE_ + " " +
-                FUNCTION_ + " " + to_string(LINE_) + " " + s + "\n";
+    log_line_ += string(cs) + loglevel_str[loglevel_] + " " + FILE_ + " " +
+                 FUNCTION_ + " " + to_string(LINE_) + " " + s + "\n";
+
+    if (Logger::color_) {
+        log_line_ += "\033[0m";
+    }
 }

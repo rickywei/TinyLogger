@@ -1,0 +1,10 @@
+language: cpp
+branches: master
+
+before_script:
+  - mkdir build
+  - cd build
+  - cmake ..
+
+script:
+  - make

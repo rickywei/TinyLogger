@@ -1,6 +1,10 @@
 # TingLogger
 A C++ Asynchronous Logging library
 
+
+![GitHub](https://img.shields.io/github/license/RickyWei/TinyLogger)
+![GitHub last commit](https://img.shields.io/github/last-commit/RickyWei/TinyLogger)
+
 ## How to use
 
 Just inculde the hear file and source file in your project

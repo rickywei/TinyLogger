@@ -2,9 +2,15 @@ language: cpp
 branches: master
 
 before_script:
-  - mkdir build
+  - mkdir -p build
   - cd build
   - cmake ..
 
 script:
   - make
+
+after_script:
+  - cd ..
+  - git add .
+  - git commit -m "travis auto build"
+  - git push

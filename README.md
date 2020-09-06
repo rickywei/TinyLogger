@@ -1,9 +1,10 @@
 # TingLogger
 A C++ Asynchronous Logging library
 
-![Travis (.com)](https://img.shields.io/travis/com/RickyWei/TinyLogger)
 ![GitHub](https://img.shields.io/github/license/RickyWei/TinyLogger)
 ![GitHub last commit](https://img.shields.io/github/last-commit/RickyWei/TinyLogger)
+![Travis (.com)](https://img.shields.io/travis/com/RickyWei/TinyLogger)
+
 
 ## How to use
 

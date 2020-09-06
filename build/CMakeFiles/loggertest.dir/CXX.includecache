@@ -1,0 +1,26 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+.././inc/Logger.h
+condition_variable
+-
+fstream
+-
+map
+-
+mutex
+-
+sstream
+-
+string
+-
+
+/home/ricky/TinyLogger/main.cc
+Logger.h
+/home/ricky/TinyLogger/Logger.h
+

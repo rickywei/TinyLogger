@@ -4,6 +4,7 @@ branches: master
 before_script:
   - mkdir -p build
   - cd build
+  - rm -rf *
   - cmake ..
 
 script:

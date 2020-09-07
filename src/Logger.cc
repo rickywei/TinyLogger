@@ -36,15 +36,7 @@ Logger::Logger(string FILE, string FUNCTION, int LINE, LogLevel loglevel)
 }
 
 Logger::~Logger() {
-    // lock_guard<mutex> lk(mtx_);
-    if (Logger::write_terminal_) {
-        cerr << log_line_ << flush;
-    }
-    Logger::busy_buf_ << log_line_;
-}
-
-Logger& Logger::operator<<(string s) {
-    Format(s);
+    Format(log_line_);
     if (Logger::busy_buf_.str().size() >= MAX_LOG_BUF_SIZE) {
         // local scope
         {
@@ -53,6 +45,15 @@ Logger& Logger::operator<<(string s) {
         }
         Logger::cond_.notify_one();
     }
+
+    if (Logger::write_terminal_) {
+        cerr << log_line_ << flush;
+    }
+    Logger::busy_buf_ << log_line_;
+}
+
+Logger& Logger::operator<<(string s) {
+    log_line_ += s;
     return *this;
 }
 

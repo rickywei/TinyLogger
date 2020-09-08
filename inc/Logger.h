@@ -5,7 +5,6 @@
 #include <fstream>
 #include <map>
 #include <mutex>
-#include <sstream>
 #include <string>
 
 using namespace std;
@@ -51,8 +50,8 @@ class Logger : nocopyable {
     static string file_name_;
     static fstream file_;
 
-    static stringstream busy_buf_;
-    static stringstream free_buf_;
+    static string busy_buf_;
+    static string free_buf_;
 
     static condition_variable cond_;
     static mutex mtx_;

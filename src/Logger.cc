@@ -28,7 +28,7 @@ Logger::Logger(string FILE, string FUNCTION, int LINE, LogLevel loglevel)
 }
 
 Logger::~Logger() {
-    if (Logger::busy_buf_.str().size() >= MAX_LOG_BUF_SIZE) {
+    if (Logger::busy_buf_.size() >= MAX_LOG_BUF_SIZE) {
         // local scope
         {
             lock_guard<mutex> lk(Logger::mtx_);
@@ -37,7 +37,7 @@ Logger::~Logger() {
         Logger::cond_.notify_one();
     }
     log_line_ += "\n";
-    busy_buf_ << log_line_;
+    busy_buf_ += log_line_;
 
     if (Logger::write_terminal_) {
         AddColorBegin();
@@ -54,8 +54,8 @@ Logger& Logger::operator<<(string s) {
 void Logger::Init(bool isterminal) {
     Logger::write_terminal_ = isterminal;
 
-    Logger::busy_buf_.str().reserve(MAX_LOG_BUF_SIZE);
-    Logger::free_buf_.str().reserve(MAX_LOG_BUF_SIZE);
+    Logger::busy_buf_.reserve(MAX_LOG_BUF_SIZE);
+    Logger::free_buf_.reserve(MAX_LOG_BUF_SIZE);
 
     thread th(Logger::ThreadFunc);
     if (th.joinable()) {
@@ -65,7 +65,7 @@ void Logger::Init(bool isterminal) {
 
 void Logger::Stop() { Logger::looping_ = false; }
 
-bool Logger::HasLog() { return Logger::free_buf_.str().size(); }
+bool Logger::HasLog() { return Logger::free_buf_.size(); }
 
 void Logger::SetColor(bool color) { Logger::color_ = color; }
 
@@ -74,8 +74,8 @@ bool Logger::write_terminal_ = false;
 string Logger::file_name_ = "log.log";
 fstream Logger::file_ = fstream();
 
-stringstream Logger::busy_buf_ = stringstream();
-stringstream Logger::free_buf_ = stringstream();
+string Logger::busy_buf_ = string();
+string Logger::free_buf_ = string();
 
 condition_variable Logger::cond_;
 mutex Logger::mtx_;
@@ -93,24 +93,24 @@ void Logger::ThreadFunc() {
         cond_.wait_for(ulk, Logger::interval_ * 1s,
                        [] { return Logger::HasLog(); });
 
-        if (Logger::busy_buf_.str().size()) {
+        if (Logger::busy_buf_.size()) {
             swap(Logger::busy_buf_, Logger::free_buf_);
-            Logger::file_ << Logger::free_buf_.str() << flush;
-            Logger::free_buf_.str("");
+            Logger::file_ << Logger::free_buf_ << flush;
+            Logger::free_buf_.clear();
             // cout << HasLog() << "busy " << Logger::free_buf_.str() << endl;
         }
     }
 
-    if (Logger::free_buf_.str().size() || busy_buf_.str().size()) {
+    if (Logger::free_buf_.size() || busy_buf_.size()) {
         if (!Logger::file_.is_open()) {
             file_ = fstream(Logger::file_name_, ios::app);
         }
     }
-    if (Logger::free_buf_.str().size()) {
-        Logger::file_ << Logger::free_buf_.str() << flush;
+    if (Logger::free_buf_.size()) {
+        Logger::file_ << Logger::free_buf_ << flush;
     }
-    if (busy_buf_.str().size()) {
-        Logger::file_ << Logger::busy_buf_.str() << flush;
+    if (busy_buf_.size()) {
+        Logger::file_ << Logger::busy_buf_ << flush;
     }
     file_.close();
 }

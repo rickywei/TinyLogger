@@ -1,5 +1,7 @@
 #include "Logger.h"
 
+#include <string.h>
+
 #include <chrono>
 #include <ctime>
 #include <iostream>
@@ -11,7 +13,7 @@ using namespace log;
 #define MAX_LOG_BUF_SIZE 102400
 #define WAIT_INTERVAL 2
 
-map<LogLevel, string> loglevel_str = {
+const map<LogLevel, string> loglevel_str = {
     {LogLevel::FATAL, "FATAL"}, {LogLevel::ERROR, "ERROR"},
     {LogLevel::WARN, "WARN "},  {LogLevel::INFO, "INFO "},
     {LogLevel::DEBUG, "DEBUG"},
@@ -24,10 +26,12 @@ Logger::Logger(string FILE, string FUNCTION, int LINE, LogLevel loglevel)
       FUNCTION_(FUNCTION),
       LINE_(LINE) {
     log_line_.reserve(MAX_LOG_LINE_LEN);
+    CheckDate();
     Format();
 }
 
 Logger::~Logger() {
+    CheckDate();
     if (Logger::busy_buf_.size() >= MAX_LOG_BUF_SIZE) {
         // local scope
         {
@@ -40,8 +44,7 @@ Logger::~Logger() {
     busy_buf_ += log_line_;
 
     if (Logger::write_terminal_) {
-        AddColorBegin();
-        AddColorEnd();
+        AddColor();
         cerr << log_line_ << flush;
     }
 }
@@ -71,14 +74,16 @@ void Logger::SetColor(bool color) { Logger::color_ = color; }
 
 bool Logger::write_terminal_ = false;
 
-string Logger::file_name_ = "log.log";
+string Logger::file_name_ = string();
 fstream Logger::file_ = fstream();
+string Logger::date_ = string();
 
 string Logger::busy_buf_ = string();
 string Logger::free_buf_ = string();
 
 condition_variable Logger::cond_;
 mutex Logger::mtx_;
+mutex Logger::mtx_f_;
 bool Logger::looping_ = true;
 int Logger::interval_ = WAIT_INTERVAL;
 
@@ -95,7 +100,11 @@ void Logger::ThreadFunc() {
 
         if (Logger::busy_buf_.size()) {
             swap(Logger::busy_buf_, Logger::free_buf_);
-            Logger::file_ << Logger::free_buf_ << flush;
+            // local scope
+            {
+                lock_guard<mutex> lk(Logger::mtx_f_);
+                Logger::file_ << Logger::free_buf_ << flush;
+            }
             Logger::free_buf_.clear();
             // cout << HasLog() << "busy " << Logger::free_buf_.str() << endl;
         }
@@ -107,62 +116,105 @@ void Logger::ThreadFunc() {
         }
     }
     if (Logger::free_buf_.size()) {
-        Logger::file_ << Logger::free_buf_ << flush;
-    }
-    if (busy_buf_.size()) {
-        Logger::file_ << Logger::busy_buf_ << flush;
-    }
-    file_.close();
-}
-
-void Logger::SetFileName(const string file_name) {
-    if (file_name != Logger::file_name_) {
-        file_name_ = file_name;
-        if (Logger::file_.is_open()) {
-            file_.close();
+        {
+            lock_guard<mutex> lk(Logger::mtx_f_);
+            Logger::file_ << Logger::free_buf_ << flush;
         }
     }
-    if (!file_.is_open()) {
-        file_ = fstream(file_name, ios::app);
+    if (busy_buf_.size()) {
+        {
+            lock_guard<mutex> lk(Logger::mtx_f_);
+            Logger::file_ << Logger::free_buf_ << flush;
+        }
     }
+
+    if (file_.is_open()) {
+        file_.close();
+    }
+}
+
+void Logger::CheckDate() {
+    if (Logger::date_ < Logger::GetNowDate()) {
+        lock_guard<mutex> lk(Logger::mtx_f_);
+        if (Logger::date_ < Logger::GetNowDate()) {
+            Logger::date_ = Logger::GetNowDate();
+            Logger::file_name_ = Logger::date_ + ".log";
+            fstream new_file = fstream(Logger::file_name_, ios::app);
+            Logger::file_.swap(new_file);
+            if (new_file.is_open()) {
+                new_file.close();
+            }
+        }
+    }
+}
+
+string Logger::GetNowDate() {
+    string s;
+    // year
+    for (int i = 7; i <= 10; ++i) {
+        s += __DATE__[i];
+    }
+
+    // month
+    string m(__DATE__, 3);
+    if (m == "Jan") {
+        s += "01";
+    } else if (m == "Feb") {
+        s += "02";
+    } else if (m == "Mar") {
+        s += "03";
+    } else if (m == "Apr") {
+        s += "04";
+    } else if (m == "May") {
+        s += "05";
+    } else if (m == "Jun") {
+        s += "06";
+    } else if (m == "Jul") {
+        s += "07";
+    } else if (m == "Aug") {
+        s += "08";
+    } else if (m == "Sep") {
+        s += "09";
+    } else if (m == "Oct") {
+        s += "10";
+    } else if (m == "Nov") {
+        s += "11";
+    } else if (m == "Dec") {
+        s += "12";
+    }
+
+    for (int i = 4; i <= 5; ++i) {
+        s += __DATE__[i] == ' ' ? '0' : __DATE__[i];
+    }
+
+    return move(s);
 }
 
 void Logger::Format() {
-    time_t rawtime;
-    time(&rawtime);
-    tm timeinfo;
-    localtime_r(&rawtime, &timeinfo);
-    char cs[64] = {'\0'};
-    strftime(cs, 64, "%Y%m%d %X ", &timeinfo);
-    log_line_ += string(cs) + loglevel_str[loglevel_] + " " + FILE_ + " " +
-                 FUNCTION_ + " " + to_string(LINE_);
+    log_line_ += Logger::date_ + " " + __TIME__ + " " +
+                 loglevel_str.at(loglevel_) + " " + FILE_ + " " + FUNCTION_ +
+                 " " + to_string(LINE_);
 }
 
-void Logger::AddColorBegin() {
+void Logger::AddColor() {
     if (Logger::color_) {
         switch (Logger::loglevel_) {
             case LogLevel::FATAL:
-                log_line_ = "\033[31m" + log_line_;
+                log_line_ = "\033[31m" + log_line_ + "\033[0m";
                 break;
             case LogLevel::ERROR:
-                log_line_ = "\033[31m" + log_line_;
+                log_line_ = "\033[31m" + log_line_ + "\033[0m";
                 break;
             case LogLevel::WARN:
-                log_line_ = "\033[33m" + log_line_;
+                log_line_ = "\033[33m" + log_line_ + "\033[0m";
                 break;
             case LogLevel::INFO:
                 break;
             case LogLevel::DEBUG:
-                log_line_ = "\033[32m" + log_line_;
+                log_line_ = "\033[32m" + log_line_ + "\033[0m";
                 break;
             default:
                 break;
         }
-    }
-}
-
-void Logger::AddColorEnd() {
-    if (Logger::color_) {
-        log_line_ += "\033[0m";
     }
 }

@@ -49,12 +49,14 @@ class Logger : nocopyable {
 
     static string file_name_;
     static fstream file_;
+    static string date_;
 
     static string busy_buf_;
     static string free_buf_;
 
     static condition_variable cond_;
     static mutex mtx_;
+    static mutex mtx_f_;
     static bool looping_;
     static int interval_;
 
@@ -63,10 +65,11 @@ class Logger : nocopyable {
     static void ThreadFunc();
 
     static void SetFileName(const string file_name = "log.log");
+    static void CheckDate();
+    static string GetNowDate();
 
     void Format();
-    void AddColorBegin();
-    void AddColorEnd();
+    void AddColor();
 };
 
 #define LOG() Logger(__FILE__, __FUNCTION__, __LINE__)

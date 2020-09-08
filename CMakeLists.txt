@@ -10,6 +10,6 @@ include_directories(./inc)
 
 aux_source_directory(./src SRC)
 
-add_executable(loggertest main.cc ${SRC})
+add_executable(loggertest.exe main.cc ${SRC})
 
-target_link_libraries(loggertest pthread)
+target_link_libraries(loggertest.exe pthread)

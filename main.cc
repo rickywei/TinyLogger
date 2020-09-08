@@ -1,18 +1,24 @@
+#include <unistd.h>
+
 #include "Logger.h"
+
 using namespace std;
 using namespace log;
 
 int main() {
-    Logger::Init(true, false);
+    Logger::Init(true);
     Logger::SetColor(true);
 
-    LOG() << "LOG";
+    LOG() << "LOG"
+          << "test";
     LOGL(LogLevel::INFO) << "LOGL";
     FATAL() << "FATAL";
     ERROR() << "ERROR";
     WARN() << "WARN";
     INFO() << "INFO";
     DEBUG() << "DEBUG";
+
+    sleep(3);
 
     Logger::Stop();
 

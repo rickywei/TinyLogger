@@ -26,17 +26,15 @@ class nocopyable {
 
 class Logger : nocopyable {
    public:
-    Logger(string FILE, string FUNCTION, int LINE);
-    Logger(string FILE, string FUNCTION, int LINE, LogLevel loglevel);
+    Logger(string FILE, string FUNCTION, int LINE,
+           LogLevel LogLevel = LogLevel::INFO);
     ~Logger();
 
     Logger& operator<<(string s);
 
-    static void Init();
-    static void Init(bool t, bool f);
+    static void Init(bool isterminal = false);
     static void Stop();
     static bool HasLog();
-    static void SetWriteChannel(bool t, bool f);
     static void SetColor(bool color);
 
    private:
@@ -49,7 +47,6 @@ class Logger : nocopyable {
     int LINE_;
 
     static bool write_terminal_;
-    static bool write_file_;
 
     static string file_name_;
     static fstream file_;
@@ -59,7 +56,6 @@ class Logger : nocopyable {
 
     static condition_variable cond_;
     static mutex mtx_;
-    static mutex mtx_f_;
     static bool looping_;
     static int interval_;
 
@@ -67,10 +63,11 @@ class Logger : nocopyable {
 
     static void ThreadFunc();
 
-    static void SetFileName();
-    static void SetFileName(const string file_name);
+    static void SetFileName(const string file_name = "log.log");
 
-    void Format(const string& s);
+    void Format();
+    void AddColorBegin();
+    void AddColorEnd();
 };
 
 #define LOG() Logger(__FILE__, __FUNCTION__, __LINE__)

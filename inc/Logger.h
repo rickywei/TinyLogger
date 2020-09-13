@@ -67,6 +67,7 @@ class Logger : nocopyable {
     static void SetFileName(const string file_name = "log.log");
     static void CheckDate();
     static string GetNowDate();
+    static string GetNowTime();
 
     void Format();
     void AddColor();

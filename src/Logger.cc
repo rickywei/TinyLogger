@@ -149,49 +149,27 @@ void Logger::CheckDate() {
 }
 
 string Logger::GetNowDate() {
-    string s;
-    // year
-    for (int i = 7; i <= 10; ++i) {
-        s += __DATE__[i];
-    }
+    char tmp[16];
+    time_t rawtime;
+    tm timeinfo;
+    time(&rawtime);
+    localtime_r(&rawtime, &timeinfo);
+    strftime(tmp, 16, "%Y%m%d", &timeinfo);
+    return move(string(string(tmp)));
+}
 
-    // month
-    string m(__DATE__, 3);
-    if (m == "Jan") {
-        s += "01";
-    } else if (m == "Feb") {
-        s += "02";
-    } else if (m == "Mar") {
-        s += "03";
-    } else if (m == "Apr") {
-        s += "04";
-    } else if (m == "May") {
-        s += "05";
-    } else if (m == "Jun") {
-        s += "06";
-    } else if (m == "Jul") {
-        s += "07";
-    } else if (m == "Aug") {
-        s += "08";
-    } else if (m == "Sep") {
-        s += "09";
-    } else if (m == "Oct") {
-        s += "10";
-    } else if (m == "Nov") {
-        s += "11";
-    } else if (m == "Dec") {
-        s += "12";
-    }
-
-    for (int i = 4; i <= 5; ++i) {
-        s += __DATE__[i] == ' ' ? '0' : __DATE__[i];
-    }
-
-    return move(s);
+string Logger::GetNowTime() {
+    char tmp[16];
+    time_t rawtime;
+    tm timeinfo;
+    time(&rawtime);
+    localtime_r(&rawtime, &timeinfo);
+    strftime(tmp, 16, "%X", &timeinfo);
+    return move(string(string(tmp)));
 }
 
 void Logger::Format() {
-    log_line_ += Logger::date_ + " " + __TIME__ + " " +
+    log_line_ += Logger::date_ + " " + Logger::GetNowDate() + " " +
                  loglevel_str.at(loglevel_) + " " + FILE_ + " " + FUNCTION_ +
                  " " + to_string(LINE_);
 }

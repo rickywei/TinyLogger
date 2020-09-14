@@ -110,6 +110,30 @@ void Logger::ThreadFunc() {
         }
     }
 
+    Logger::FlushALL();
+
+    if (file_.is_open()) {
+        file_.close();
+    }
+}
+
+void Logger::CheckDate() {
+    if (Logger::date_ < Logger::GetNowDate()) {
+        lock_guard<mutex> lk(Logger::mtx_f_);
+        if (Logger::date_ < Logger::GetNowDate()) {
+            FlushALL();
+            Logger::date_ = Logger::GetNowDate();
+            Logger::file_name_ = Logger::date_ + ".log";
+            fstream new_file = fstream(Logger::file_name_, ios::app);
+            Logger::file_.swap(new_file);
+            if (new_file.is_open()) {
+                new_file.close();
+            }
+        }
+    }
+}
+
+void Logger::FlushALL() {
     if (Logger::free_buf_.size() || busy_buf_.size()) {
         if (!Logger::file_.is_open()) {
             file_ = fstream(Logger::file_name_, ios::app);
@@ -125,25 +149,6 @@ void Logger::ThreadFunc() {
         {
             lock_guard<mutex> lk(Logger::mtx_f_);
             Logger::file_ << Logger::free_buf_ << flush;
-        }
-    }
-
-    if (file_.is_open()) {
-        file_.close();
-    }
-}
-
-void Logger::CheckDate() {
-    if (Logger::date_ < Logger::GetNowDate()) {
-        lock_guard<mutex> lk(Logger::mtx_f_);
-        if (Logger::date_ < Logger::GetNowDate()) {
-            Logger::date_ = Logger::GetNowDate();
-            Logger::file_name_ = Logger::date_ + ".log";
-            fstream new_file = fstream(Logger::file_name_, ios::app);
-            Logger::file_.swap(new_file);
-            if (new_file.is_open()) {
-                new_file.close();
-            }
         }
     }
 }
@@ -169,7 +174,7 @@ string Logger::GetNowTime() {
 }
 
 void Logger::Format() {
-    log_line_ += Logger::date_ + " " + Logger::GetNowDate() + " " +
+    log_line_ += Logger::date_ + " " + Logger::GetNowTime() + " " +
                  loglevel_str.at(loglevel_) + " " + FILE_ + " " + FUNCTION_ +
                  " " + to_string(LINE_);
 }

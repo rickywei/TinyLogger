@@ -1,0 +1,1 @@
+g++     CMakeFiles/loggertest.exe.dir/main.cc.o CMakeFiles/loggertest.exe.dir/src/Logger.cc.o  -o loggertest.exe -lpthread 

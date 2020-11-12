@@ -1,5 +1,5 @@
 language: cpp
-branches: master
+branches: main
 
 # before_script:
 #   - mkdir -p build

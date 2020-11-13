@@ -1,8 +1,13 @@
 #!/bin/sh
 
-mkdir build
+if [ ! -d "./build" ]; then
+  mkdir ./build
+else
+  rm -rf ./build/*
+fi
+
 cd build
-rm -rf *
+
 cmake ..
 make
 

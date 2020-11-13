@@ -1,0 +1,7 @@
+20201113 15:26:13 INFO  /home/ricky/projects/TinyLogger/main.cc main 11 LOG test
+20201113 15:26:13 INFO  /home/ricky/projects/TinyLogger/main.cc main 13 LOGL
+20201113 15:26:13 FATAL /home/ricky/projects/TinyLogger/main.cc main 14 FATAL
+20201113 15:26:13 ERROR /home/ricky/projects/TinyLogger/main.cc main 15 ERROR
+20201113 15:26:13 WARN  /home/ricky/projects/TinyLogger/main.cc main 16 WARN
+20201113 15:26:13 INFO  /home/ricky/projects/TinyLogger/main.cc main 17 INFO
+20201113 15:26:13 DEBUG /home/ricky/projects/TinyLogger/main.cc main 18 DEBUG

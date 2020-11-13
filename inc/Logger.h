@@ -7,7 +7,7 @@
 #include <mutex>
 #include <string>
 
-namespace log {
+namespace tiny {
 
 using namespace std;
 
@@ -82,6 +82,6 @@ class Logger : nocopyable {
 #define INFO() Logger(__FILE__, __FUNCTION__, __LINE__, LogLevel::INFO)
 #define DEBUG() Logger(__FILE__, __FUNCTION__, __LINE__, LogLevel::DEBUG)
 
-}  // namespace log
+}  // namespace tiny
 
 #endif

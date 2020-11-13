@@ -7,7 +7,7 @@
 #include <iostream>
 #include <thread>
 
-using namespace log;
+using namespace tiny;
 
 constexpr int MAX_LOG_LINE_LEN = 512;
 constexpr int MAX_LOG_BUF_SIZE = 102400;

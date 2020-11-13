@@ -1,3 +1,0 @@
-/home/ricky/projects/TinyLogger/build/CMakeFiles/rebuild_cache.dir
-/home/ricky/projects/TinyLogger/build/CMakeFiles/loggertest.exe.dir
-/home/ricky/projects/TinyLogger/build/CMakeFiles/edit_cache.dir

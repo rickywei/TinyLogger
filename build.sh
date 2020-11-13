@@ -1,6 +1,6 @@
 #!/bin/sh
 
-mkdir -p build
+mkdir build
 cd build
 rm -rf *
 cmake ..
